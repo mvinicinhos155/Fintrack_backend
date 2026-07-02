@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const users_1 = __importDefault(require("../controllers/users"));
+const login_1 = __importDefault(require("../controllers/login"));
+const auth_1 = require("../middlewares/auth");
+const transfer_1 = __importDefault(require("../controllers/transfer"));
+const historico_1 = __importDefault(require("../controllers/historico"));
+const routes = (0, express_1.Router)();
+routes.post("/create/user", users_1.default.createUser);
+routes.get("/find/users", auth_1.auth, auth_1.isAdmin, users_1.default.getUsers);
+routes.get("/find/user", auth_1.auth, users_1.default.getUser);
+routes.put("/update/user/:id", auth_1.auth, auth_1.isAdmin, users_1.default.updateRole);
+routes.post("/login", login_1.default.create);
+routes.post("/transfer", auth_1.auth, transfer_1.default.transferBank);
+routes.post("/deposit", auth_1.auth, transfer_1.default.depositBank);
+routes.post("/withdraw", auth_1.auth, transfer_1.default.withdrawBank);
+routes.get("/find/trasition", auth_1.auth, historico_1.default.getHistorico);
+exports.default = routes;

@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TypeRole {
+  ADMIN
+  USER
+}
+
+enum TipoTransacao {
+  DEPOSITO
+  SAQUE
+  TRANSFERENCIA
+}
+
+model Usuario {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  password String
+  role TypeRole @default(USER)
+  conta Conta?
+  createdAt DateTime @default(now())
+}
+
+
+model Conta {
+  id String @id @default(cuid())
+  saldo Decimal @db.Decimal(10,2)
+  userId String @unique
+  user Usuario @relation(fields: [userId], references: [id])
+  enviadas  Transacao[] @relation("ContaOrigem")
+  recebidas Transacao[] @relation("ContaDestino")
+}
+
+model Transacao {
+  id String @id @default(cuid())
+
+  valor Decimal @db.Decimal(10,2)
+  descricao String?
+
+  contaOrigemId String?
+  contaOrigem Conta? @relation("ContaOrigem", fields: [contaOrigemId], references: [id])
+
+  contaDestinoId String?
+  contaDestino Conta? @relation("ContaDestino", fields: [contaDestinoId], references: [id])
+
+
+  tipo TipoTransacao @default(TRANSFERENCIA)
+
+  createdAt DateTime @default(now())
+}
